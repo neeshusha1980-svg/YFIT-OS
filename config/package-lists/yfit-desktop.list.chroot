@@ -35,7 +35,8 @@ engrampa
 # Display/login/session services
 lightdm
 lightdm-gtk-greeter
-policykit-1
+polkitd
+pkexec
 mate-polkit
 udisks2
 gvfs
