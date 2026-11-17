@@ -43,4 +43,4 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the live-build directory ma
 
 ## GitHub Actions build capacity
 
-The workflow uses the free standard GitHub-hosted `ubuntu-24.04` AMD64 runner. It checks actual free workspace disk after safe cleanup and dependency installation. The 30 GiB minimum is enforced in both the workflow and build script and cannot be overridden. If that runner does not provide 30 GiB free, the build stops before live-build; no ISO artifact is uploaded. A successful ISO build has not yet been verified for this checkout.
+The workflow uses the free standard GitHub-hosted `ubuntu-24.04` AMD64 runner and an isolated Debian Trixie build container. It measures actual free workspace disk after safe cleanup and toolchain installation. The 30 GiB minimum remains enforced in both the workflow and build script with no override. If that runner does not provide 30 GiB free, the job stops before live-build and uploads no ISO. No successful ISO build has yet been verified.

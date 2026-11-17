@@ -79,23 +79,15 @@ jobs:
           echo 'Disk after cleanup:'
           df -h "$GITHUB_WORKSPACE"
 
-      - name: Install Debian live-build and ISO verification dependencies
+      - name: Prepare isolated Debian Trixie build environment
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends debian-archive-keyring
-          printf 'deb [check-valid-until=no signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] https://snapshot.debian.org/archive/debian/%s trixie main\n' \
-            "$YFIT_DEBIAN_SNAPSHOT" | sudo tee /etc/apt/sources.list.d/yfit-trixie-build-tools.list >/dev/null
-          sudo apt-get update
-          # Use Debian Trixie's pinned live-build and debootstrap on the Ubuntu VM.
-          sudo apt-get install -y -t trixie live-build debootstrap
-          sudo apt-get install -y --no-install-recommends \
-            xorriso squashfs-tools grub-common grub-pc-bin grub-efi-amd64-bin \
-            mtools dosfstools file rsync dpkg-dev
-          sudo rm -f /etc/apt/sources.list.d/yfit-trixie-build-tools.list
-          sudo apt-get clean
-          sudo rm -rf /var/lib/apt/lists/*
+          sudo docker build \
+            --platform linux/amd64 \
+            --build-arg "YFIT_DEBIAN_SNAPSHOT=$YFIT_DEBIAN_SNAPSHOT" \
+            --file .github/docker/trixie-build.Dockerfile \
+            --tag yfit-os-trixie-build:local .
 
       - name: Check available build space
         shell: bash
@@ -108,28 +100,24 @@ jobs:
             df -h "$GITHUB_WORKSPACE" >&2 || true
             exit 1
           fi
-          echo "Available workspace storage: $((available_kib / 1024 / 1024)) GiB"
+          echo "Available workspace storage after installing the isolated build toolchain: $((available_kib / 1024 / 1024)) GiB"
           echo 'Required workspace storage: 30 GiB'
           if (( available_kib < required_kib )); then
-            echo 'Insufficient disk space after safe runner cleanup. Need at least 30 GiB free for the live-build chroot, ISO, and verification reports.' >&2
+            echo 'Insufficient disk space after safe runner cleanup and toolchain installation. Need at least 30 GiB free before live-build.' >&2
             df -h "$GITHUB_WORKSPACE" >&2
             exit 1
           fi
 
-      - name: Confirm build toolchain
+      - name: Build, checksum, and verify the ISO
         shell: bash
         run: |
           set -euo pipefail
-          for tool in lb debootstrap xorriso mksquashfs grub-mkstandalone file sha256sum dpkg-query; do
-            command -v "$tool" >/dev/null 2>&1 || {
-              echo "Required build tool is unavailable after dependency installation: $tool" >&2
-              exit 1
-            }
-          done
-          lb --version
-
-      - name: Build, checksum, and verify the ISO
-        run: sudo ./scripts/build-iso.sh
+          sudo docker run --rm --privileged --platform linux/amd64 \
+            --volume "$GITHUB_WORKSPACE:/workspace" \
+            --workdir /workspace \
+            --env "YFIT_DEBIAN_SNAPSHOT=$YFIT_DEBIAN_SNAPSHOT" \
+            yfit-os-trixie-build:local \
+            ./scripts/build-iso.sh
 
       - name: Upload ISO and build evidence
         uses: actions/upload-artifact@v4

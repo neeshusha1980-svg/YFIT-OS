@@ -1,10 +1,10 @@
 # Build and download Yfit OS
 
-Yfit OS is configured as a real Debian GNU/Linux 13 (Trixie) AMD64 live ISO. `auto/config` pins the live-build target to `trixie` and `amd64`. The workflow builds on a GitHub-hosted Ubuntu 24.04 AMD64 VM, using Debian Trixie's pinned `live-build` and `debootstrap` tools. It uploads an artifact only after ISO and boot-structure verification pass.
+Yfit OS is configured as a real Debian GNU/Linux 13 (Trixie) AMD64 live ISO. `auto/config` pins the live-build target to `trixie` and `amd64`. The workflow runs on a GitHub-hosted Ubuntu 24.04 AMD64 VM and builds inside an isolated Debian Trixie AMD64 container with live-build and debootstrap from the pinned Debian Snapshot. This prevents Trixie host-tool dependencies from upgrading or conflicting with Ubuntu packages. It uploads an artifact only after ISO and boot-structure verification pass.
 
 ## Build from an Android phone with GitHub Actions
 
-You do not need a PC or Linux server. GitHub Actions runs the build remotely. The workflow removes only unrelated preinstalled tool directories from its temporary VM, installs build dependencies, and checks actual available disk before starting. Both the workflow and build script require at least 30 GiB free. If cleanup cannot provide that, the workflow stops with a clear space error instead of risking a partial build.
+You do not need a PC or Linux server. GitHub Actions runs the build remotely. The workflow removes only unrelated preinstalled tool directories from its temporary VM, builds a pinned Debian Trixie toolchain container, then checks actual available disk before live-build. The build script repeats the 30 GiB check inside the container. If either check cannot confirm at least 30 GiB free, the workflow stops clearly without starting the ISO build.
 
 ### 1. Create an empty GitHub repository
 
@@ -45,7 +45,7 @@ The `.gitignore` excludes generated ISO files, checksums, and build reports, so 
 
 ### Runner disk capacity
 
-The workflow is intentionally pinned to the free standard `ubuntu-24.04` GitHub-hosted AMD64 runner. It removes only listed, unrelated preinstalled SDK directories on that ephemeral VM, installs the build tools, then measures actual free space on the workspace filesystem. Both the workflow and `scripts/build-iso.sh` enforce a hard minimum of 30 GiB; neither accepts an override. If the standard runner has less space, the job stops before live-build and does not upload an ISO. This is an expected safe failure on runner images whose available storage is below the requirement. No ISO is produced by that failed run.
+The workflow is intentionally pinned to the free standard `ubuntu-24.04` GitHub-hosted AMD64 runner. It removes only listed, unrelated preinstalled SDK directories on that ephemeral VM and builds the toolchain in a Debian Trixie container. It then measures actual workspace storage after the container and dependencies are present. The workflow and `scripts/build-iso.sh` both enforce a hard minimum of 30 GiB; neither accepts an override. If storage is below the requirement, the job stops before live-build and uploads no ISO.
 ### 3. Start the build
 
 Pushing a commit to `main` starts the workflow automatically. To start it manually on the GitHub website:
@@ -56,7 +56,7 @@ Pushing a commit to `main` starts the workflow automatically. To start it manual
 4. Select **Run workflow**, choose branch `main`, and confirm.
 
 
-The workflow validates scripts/assets and scans for common committed credential patterns. It installs Debian Trixie `live-build` and `debootstrap` from the pinned Debian snapshot, builds on an AMD64 host, verifies the ISO9660 file, SHA256 checksum, kernel, initramfs, live root filesystem, and BIOS/UEFI boot entries, then uploads the evidence. No artifact is uploaded if build or verification fails.
+The workflow validates scripts/assets and scans for common committed credential patterns. It installs live-build, debootstrap, xorriso, SquashFS, GRUB, and verification tools inside the isolated Debian Trixie container using the pinned Debian snapshot. It verifies the ISO9660 file, SHA256 checksum, kernel, initramfs, live root filesystem, and BIOS/UEFI boot entries before uploading evidence. No artifact is uploaded if the build or verification fails.
 
 ### 4. Download the ISO
 
@@ -86,7 +86,7 @@ sudo apt-get install -y live-build debootstrap xorriso squashfs-tools \
   grub-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools file rsync dpkg-dev
 ```
 
-The GitHub workflow also supports Ubuntu 24.04 AMD64 and installs `live-build` and `debootstrap` from the pinned Debian Trixie snapshot rather than Ubuntu's older package versions. Android/Termux and ARM hosts are rejected. The output target remains Debian Trixie AMD64. At least 7 GiB RAM and 30 GiB free storage are required.
+The GitHub workflow uses Ubuntu 24.04 only as the free AMD64 runner host; it installs Debian Trixie build tools in an isolated Debian container to avoid cross-distribution package upgrades on Ubuntu. Android/Termux and ARM hosts are rejected. The output target remains Debian Trixie AMD64. At least 7 GiB RAM and 30 GiB free storage are required.
 
 ```sh
 sudo ./scripts/build-iso.sh
