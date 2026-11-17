@@ -5,8 +5,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-env:
-  YFIT_DEBIAN_SNAPSHOT: 20261101T000000Z
 
 permissions:
   contents: read
@@ -49,6 +47,14 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+
+      - name: Select current Debian snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          snapshot="$(date -u +%Y%m%dT000000Z)"
+          echo "YFIT_DEBIAN_SNAPSHOT=$snapshot" >> "$GITHUB_ENV"
+          echo "Selected signed Debian snapshot: $snapshot"
 
       - name: Reclaim unused runner image space
         shell: bash

@@ -5,7 +5,3 @@ fc-cache -f
 update-initramfs -u -k all
 systemctl --root=/ set-default graphical.target
 systemctl --root=/ enable lightdm.service NetworkManager.service bluetooth.service cups.service ufw.service apparmor.service systemd-timesyncd.service
-# This override is required only while building from pinned historical Debian
-# snapshot archives. Remove it from the final live/installable system so APT
-# retains its normal freshness checks for current repositories.
-rm -f /etc/apt/apt.conf.d/99yfit-pinned-snapshot.conf

@@ -1,16 +1,17 @@
 FROM --platform=linux/amd64 debian:trixie-slim
 
-ARG YFIT_DEBIAN_SNAPSHOT=20261101T000000Z
+ARG YFIT_DEBIAN_SNAPSHOT
 
 RUN set -eux; \
+    snapshot="${YFIT_DEBIAN_SNAPSHOT:-$(date -u +%Y%m%dT000000Z)}"; \
     apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       ca-certificates debian-archive-keyring; \
     update-ca-certificates; \
     rm -f /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources; \
-    printf 'deb [check-valid-until=no signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] https://snapshot.debian.org/archive/debian/%s trixie main\n' \
-      "$YFIT_DEBIAN_SNAPSHOT" > /etc/apt/sources.list.d/yfit-build-tools.list; \
-    apt-get update -o Acquire::Check-Valid-Until=false; \
+    printf 'deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] https://snapshot.debian.org/archive/debian/%s trixie main\n' \
+      "$snapshot" > /etc/apt/sources.list.d/yfit-build-tools.list; \
+    apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       live-build debootstrap xorriso squashfs-tools grub-common grub-pc-bin \
       grub-efi-amd64-bin mtools dosfstools file rsync dpkg-dev; \

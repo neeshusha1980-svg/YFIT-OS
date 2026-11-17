@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eu
-SNAPSHOT=${YFIT_DEBIAN_SNAPSHOT:-20261101T000000Z}
+SNAPSHOT=${YFIT_DEBIAN_SNAPSHOT:-$(date -u +%Y%m%dT000000Z)}
 case "$SNAPSHOT" in
   [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]T[0-9][0-9][0-9][0-9][0-9][0-9]Z) ;;
   *) echo "YFIT_DEBIAN_SNAPSHOT must be YYYYMMDDThhmmssZ" >&2; exit 2 ;;
@@ -19,7 +19,7 @@ lb config noauto \
   --firmware-chroot true \
   --firmware-binary true \
   --apt-recommends true \
-  --apt-options '--yes -o Acquire::Check-Valid-Until=false' \
+  --apt-options '--yes' \
   --mirror-bootstrap "$ARCHIVE" \
   --mirror-chroot "$ARCHIVE" \
   --mirror-chroot-security "$SECURITY" \

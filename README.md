@@ -26,7 +26,7 @@ sudo ./scripts/build-iso.sh
 ./scripts/verify-iso.sh output/yfit-os-amd64.iso
 ```
 
-The build pins the Debian package inputs to the snapshot timestamp in `auto/config` and sets `SOURCE_DATE_EPOCH` from that timestamp. Update `YFIT_DEBIAN_SNAPSHOT` deliberately to roll the package set forward. The live session's APT sources point to the normal Debian repositories so users can receive current updates after boot/install.
+The GitHub workflow selects a dated Debian Trixie snapshot at the start of each run, records the timestamp in its build log, and derives `SOURCE_DATE_EPOCH` from it. This keeps inputs reproducible for a given run while using fresh signed Release metadata; old snapshots may expire and are not silently accepted. The live session's APT sources point to the normal Debian repositories so users can receive current updates after boot/install.
 
 Full setup, QEMU installer checks, and release gating are in [BUILD.md](BUILD.md). Architecture and installer decisions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 

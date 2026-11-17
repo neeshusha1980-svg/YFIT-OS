@@ -56,7 +56,7 @@ Pushing a commit to `main` starts the workflow automatically. To start it manual
 4. Select **Run workflow**, choose branch `main`, and confirm.
 
 
-The workflow validates scripts/assets and scans for common committed credential patterns. It installs live-build, debootstrap, xorriso, SquashFS, GRUB, and verification tools inside the isolated Debian Trixie container using the pinned Debian snapshot. Since snapshots are immutable historical archives, the build temporarily disables only APT’s `Valid-Until` freshness check while retaining Debian Release signature verification; the build hook removes that temporary setting from the final system. It verifies the ISO9660 file, SHA256 checksum, kernel, initramfs, live root filesystem, and BIOS/UEFI boot entries before uploading evidence. No artifact is uploaded if the build or verification fails.
+The workflow validates scripts/assets and scans for common committed credential patterns. It installs live-build, debootstrap, xorriso, SquashFS, GRUB, and verification tools inside the isolated Debian Trixie container using a UTC dated Debian snapshot selected when the workflow starts. The timestamp is recorded in the build log and package manifest so that each run’s package input set is identifiable. APT signature and `Valid-Until` freshness checks remain enabled. It verifies the ISO9660 file, SHA256 checksum, kernel, initramfs, live root filesystem, and BIOS/UEFI boot entries before uploading evidence. No artifact is uploaded if the build or verification fails.
 
 ### 4. Download the ISO
 

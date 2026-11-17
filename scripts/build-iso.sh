@@ -28,7 +28,7 @@ if (( available_space_kib < required_space_kib )); then
   fail 'At least 30 GiB free storage is required; refusing to start live-build.'
 fi
 
-SNAPSHOT=${YFIT_DEBIAN_SNAPSHOT:-20261101T000000Z}
+SNAPSHOT=${YFIT_DEBIAN_SNAPSHOT:-$(date -u +%Y%m%dT000000Z)}
 [[ $SNAPSHOT =~ ^[0-9]{8}T[0-9]{6}Z$ ]] || fail 'YFIT_DEBIAN_SNAPSHOT must use YYYYMMDDThhmmssZ.'
 SOURCE_DATE_EPOCH=$(date -u -d "${SNAPSHOT:0:8} ${SNAPSHOT:9:2}:${SNAPSHOT:11:2}:${SNAPSHOT:13:2}" +%s)
 export SOURCE_DATE_EPOCH YFIT_DEBIAN_SNAPSHOT=$SNAPSHOT
