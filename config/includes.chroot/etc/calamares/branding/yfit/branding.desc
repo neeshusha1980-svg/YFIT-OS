@@ -1,0 +1,26 @@
+---
+componentName: yfit
+welcomeStyleCalamares: true
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 900px,620px
+windowPlacement: center
+strings:
+    productName: Yfit OS
+    shortProductName: Yfit
+    version: "1.0"
+    shortVersion: "1.0"
+    versionedName: Yfit OS 1.0
+    shortVersionedName: Yfit OS 1.0
+    bootloaderEntryName: Yfit OS
+images:
+    productLogo: yfit-mark.png
+    productIcon: yfit-mark.png
+    productWelcome: yfit-mark.png
+sidebar: widget
+navigation: widget
+style:
+   SidebarBackground: "#111827"
+   SidebarText: "#FFFFFF"
+   SidebarTextCurrent: "#FFFFFF"
+   SidebarBackgroundCurrent: "#22C55E"

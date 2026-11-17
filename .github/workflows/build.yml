@@ -1,0 +1,149 @@
+name: Yfit OS build and checks
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  YFIT_DEBIAN_SNAPSHOT: 20261101T000000Z
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Validate project sources
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Install source validation tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils desktop-file-utils
+      - name: Validate source assets and scripts
+        run: ./tests/static-checks.sh
+      - name: Scan repository for committed credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE \
+            --exclude-dir=.git \
+            --exclude='*.ttf' \
+            --exclude='*.png' \
+            '(gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|password[[:space:]]*=[[:space:]]*[^$]|token[[:space:]]*=[[:space:]]*[^$])' .; then
+            echo 'Potential credential material found; remove it before building.' >&2
+            exit 1
+          fi
+          echo 'No known token, private-key, or literal password patterns found.'
+
+  build:
+    name: Build Debian Trixie AMD64 ISO
+    needs: static
+    # Use the free standard GitHub-hosted AMD64 runner. Its real available disk
+    # is measured below; the strict 30 GiB minimum cannot be bypassed.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Reclaim unused runner image space
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'Disk before cleanup:'
+          df -h "$GITHUB_WORKSPACE"
+          # The VM is ephemeral. Remove only known preinstalled SDKs unrelated
+          # to this build; never remove workspace data or runner services.
+          for path in \
+            /usr/local/lib/android \
+            /usr/share/dotnet \
+            /usr/local/.ghcup \
+            /opt/ghc \
+            /usr/share/swift \
+            /usr/local/share/powershell \
+            /usr/local/share/chromium \
+            /usr/share/miniconda \
+            /usr/local/julia* \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/local/share/boost; do
+            if [[ -e "$path" ]]; then
+              echo "Removing unused runner image content: $path"
+              sudo rm -rf -- "$path"
+            fi
+          done
+          sudo apt-get clean
+          echo 'Disk after cleanup:'
+          df -h "$GITHUB_WORKSPACE"
+
+      - name: Install Debian live-build and ISO verification dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends debian-archive-keyring
+          printf 'deb [check-valid-until=no signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] https://snapshot.debian.org/archive/debian/%s trixie main\n' \
+            "$YFIT_DEBIAN_SNAPSHOT" | sudo tee /etc/apt/sources.list.d/yfit-trixie-build-tools.list >/dev/null
+          sudo apt-get update
+          # Use Debian Trixie's pinned live-build and debootstrap on the Ubuntu VM.
+          sudo apt-get install -y -t trixie live-build debootstrap
+          sudo apt-get install -y --no-install-recommends \
+            xorriso squashfs-tools grub-common grub-pc-bin grub-efi-amd64-bin \
+            mtools dosfstools file rsync dpkg-dev
+          sudo rm -f /etc/apt/sources.list.d/yfit-trixie-build-tools.list
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+
+      - name: Check available build space
+        shell: bash
+        run: |
+          set -euo pipefail
+          required_kib=$((30 * 1024 * 1024))
+          available_kib=$(df -Pk "$GITHUB_WORKSPACE" | awk 'NR == 2 { print $4 }')
+          if [[ ! "$available_kib" =~ ^[0-9]+$ ]]; then
+            echo 'Unable to determine available workspace storage; refusing to build.' >&2
+            df -h "$GITHUB_WORKSPACE" >&2 || true
+            exit 1
+          fi
+          echo "Available workspace storage: $((available_kib / 1024 / 1024)) GiB"
+          echo 'Required workspace storage: 30 GiB'
+          if (( available_kib < required_kib )); then
+            echo 'Insufficient disk space after safe runner cleanup. Need at least 30 GiB free for the live-build chroot, ISO, and verification reports.' >&2
+            df -h "$GITHUB_WORKSPACE" >&2
+            exit 1
+          fi
+
+      - name: Confirm build toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          for tool in lb debootstrap xorriso mksquashfs grub-mkstandalone file sha256sum dpkg-query; do
+            command -v "$tool" >/dev/null 2>&1 || {
+              echo "Required build tool is unavailable after dependency installation: $tool" >&2
+              exit 1
+            }
+          done
+          lb --version
+
+      - name: Build, checksum, and verify the ISO
+        run: sudo ./scripts/build-iso.sh
+
+      - name: Upload ISO and build evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: yfit-os-amd64-${{ github.sha }}
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
+          path: |
+            output/yfit-os-amd64.iso
+            output/yfit-os-amd64.iso.sha256
+            output/iso-file.txt
+            output/verified-file.txt
+            output/boot-structure.txt
+            output/iso-file-list.txt
+            output/logs/**
+            output/manifests/**

@@ -1,0 +1,3 @@
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk.css");
+button.suggested-action, button.default { background-color: #F4C000; color: #111827; }
+selection { background-color: #22C55E; color: #08130C; }

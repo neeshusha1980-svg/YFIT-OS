@@ -1,0 +1,14 @@
+/chroot/
+/binary/
+/cache/
+/.build*
+/output/installer-test.qcow2
+/output/installer-test.qcow2.vars.fd
+/output/*.iso
+/output/*.iso.sha256
+/output/iso-file.txt
+/output/verified-file.txt
+/output/boot-structure.txt
+/output/iso-file-list.txt
+/output/logs/*
+/output/manifests/*

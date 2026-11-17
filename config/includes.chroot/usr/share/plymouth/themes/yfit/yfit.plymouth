@@ -1,0 +1,7 @@
+[Plymouth Theme]
+Name=Yfit OS
+Description=Yfit OS boot splash
+ModuleName=script
+[script]
+ImageDir=/usr/share/plymouth/themes/yfit
+ScriptFile=/usr/share/plymouth/themes/yfit/yfit.script

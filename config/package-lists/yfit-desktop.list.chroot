@@ -1,0 +1,108 @@
+# Base system and live support
+linux-image-amd64
+systemd-sysv
+systemd-timesyncd
+live-boot
+live-config
+live-config-systemd
+sudo
+apt
+apt-transport-https
+ca-certificates
+openssl
+
+# XFCE complete working session
+xfce4
+xfce4-goodies
+xfce4-session
+xfwm4
+xfce4-panel
+xfce4-settings
+thunar
+xfce4-terminal
+xfce4-appfinder
+xfce4-power-manager
+xfce4-notifyd
+xfce4-battery-plugin
+xfce4-pulseaudio-plugin
+xfce4-screenshooter
+xfce4-taskmanager
+xfce4-whiskermenu-plugin
+mousepad
+ristretto
+engrampa
+
+# Display/login/session services
+lightdm
+lightdm-gtk-greeter
+policykit-1
+mate-polkit
+udisks2
+gvfs
+gvfs-backends
+
+# Network, Bluetooth, audio, printing
+network-manager
+network-manager-gnome
+bluez
+blueman
+pipewire-audio
+pipewire-pulse
+wireplumber
+pavucontrol
+cups
+system-config-printer
+
+# Desktop applications and user administration
+firefox-esr
+gnome-calculator
+# Duplicate archive frontend omitted; Engrampa is the XFCE archive manager.
+mate-user-admin
+gnome-disk-utility
+synaptic
+gufw
+
+# Dock, compositor and neutral icon base; no Papirus
+plank
+picom
+adwaita-icon-theme
+adwaita-qt
+hicolor-icon-theme
+xcursor-themes
+
+# Firmware and hardware utilities
+firmware-linux
+firmware-linux-nonfree
+firmware-iwlwifi
+firmware-realtek
+firmware-amd-graphics
+firmware-intel-sound
+firmware-sof-signed
+pciutils
+usbutils
+lshw
+hwdata
+
+# Security, maintenance, and installer
+apparmor
+apparmor-profiles
+ufw
+unattended-upgrades
+needrestart
+calamares
+calamares-settings-debian
+grub-efi-amd64
+grub-pc-bin
+efibootmgr
+os-prober
+cryptsetup
+rsync
+
+# Fonts, rendering and boot splash
+sound-theme-freedesktop
+fonts-noto-core
+fonts-dejavu-core
+fontconfig
+librsvg2-common
+plymouth
+plymouth-themes

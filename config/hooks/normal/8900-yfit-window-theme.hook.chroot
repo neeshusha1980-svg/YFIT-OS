@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+SOURCE=/usr/share/themes/Daloa/xfwm4
+TARGET=/usr/share/themes/Yfit/xfwm4
+[ -d "$SOURCE" ] || { echo "Missing Debian XFWM source theme: $SOURCE" >&2; exit 1; }
+mkdir -p /usr/share/themes/Yfit
+cp -a "$SOURCE" "$TARGET"
+for image in "$TARGET"/*.xpm; do
+    [ -f "$image" ] || continue
+    sed -i \
+      -e 's/#A0A0FF/#111827/g' \
+      -e 's/#B0B0FF/#1D293B/g' \
+      -e 's/#C0C0FF/#26364B/g' \
+      -e 's/#D0D0FF/#F4C000/g' \
+      -e 's/#E0E0FF/#22C55E/g' "$image"
+done
+find "$TARGET" -type f -name '*.png' -delete
+install -D -m 0644 /usr/share/doc/xfwm4/copyright /usr/share/doc/yfit-os/DALOA-XFWM-COPYRIGHT

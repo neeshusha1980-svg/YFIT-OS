@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160" preserveAspectRatio="xMidYMid slice">
+<defs>
+ <linearGradient id="paper" x2="0.9" y2="1"><stop stop-color="#F8FAFC"/><stop offset="1" stop-color="#E7EDF3"/></linearGradient>
+ <radialGradient id="sun"><stop stop-color="#F4C000" stop-opacity=".56"/><stop offset="1" stop-color="#F4C000" stop-opacity="0"/></radialGradient>
+ <linearGradient id="leaf" x2="1" y2="1"><stop stop-color="#F4C000"/><stop offset="1" stop-color="#22C55E"/></linearGradient>
+</defs>
+<rect width="3840" height="2160" fill="url(#paper)"/>
+<ellipse cx="2670" cy="900" rx="1350" ry="1000" fill="url(#sun)"/>
+<path d="M1800 420h340l285 510 285-510h340l-455 790v490h-340v-490L1800 420Z" fill="url(#leaf)" opacity=".94"/>
+<circle cx="3020" cy="1650" r="105" fill="#22C55E"/>
+<path d="M0 1890c720-350 1290-330 1870-95 640 260 1300 220 1970-170v535H0Z" fill="#D6E0E9" opacity=".72"/>
+</svg>

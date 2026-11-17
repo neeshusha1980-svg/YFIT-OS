@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Yfit PolicyKit Authentication Agent
+Exec=/usr/libexec/polkit-mate-authentication-agent-1
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true

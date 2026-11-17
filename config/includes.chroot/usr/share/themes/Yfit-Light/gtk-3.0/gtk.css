@@ -1,0 +1,6 @@
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained.css");
+:root { --yfit-yellow: #F4C000; --yfit-green: #22C55E; }
+button.suggested-action, button.default { background-image: none; background-color: #F4C000; color: #111827; }
+button.suggested-action:hover, button.default:hover { background-color: #DBAA00; }
+selection { background-color: #22C55E; color: #08130C; }
+entry:focus, spinbutton:focus, textview text:focus { border-color: #DBAA00; }

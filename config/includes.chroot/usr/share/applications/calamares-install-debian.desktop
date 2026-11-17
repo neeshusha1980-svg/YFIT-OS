@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Install Yfit OS
+GenericName=System Installer
+Comment=Install this Yfit OS live system to a computer
+Exec=calamares-install-debian
+Icon=yfit-os
+Terminal=false
+Categories=System;Settings;
+StartupNotify=true

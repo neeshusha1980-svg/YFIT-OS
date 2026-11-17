@@ -1,0 +1,20 @@
+[Icon Theme]
+Name=Yfit
+Comment=Yfit OS icon theme with Lucide SVG assets
+Inherits=Adwaita,hicolor
+Directories=scalable/apps,scalable/places,scalable/mimetypes
+[scalable/apps]
+Size=48
+Type=Scalable
+MinSize=16
+MaxSize=512
+[scalable/places]
+Size=48
+Type=Scalable
+MinSize=16
+MaxSize=512
+[scalable/mimetypes]
+Size=48
+Type=Scalable
+MinSize=16
+MaxSize=512

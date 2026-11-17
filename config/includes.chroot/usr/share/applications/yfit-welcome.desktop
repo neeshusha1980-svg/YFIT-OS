@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Yfit OS Information
+Comment=Read the Yfit OS hardware, security, and support notes
+Exec=mousepad /usr/local/share/yfit/README.txt
+Icon=yfit-os
+Terminal=false
+Categories=Documentation;System;

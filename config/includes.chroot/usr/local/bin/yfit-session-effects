@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+# XFCE's own compositor is disabled in the shipped settings before Picom starts.
+if command -v pgrep >/dev/null 2>&1 && ! pgrep -x picom >/dev/null 2>&1; then
+    picom --config /etc/xdg/picom.conf --corner-radius 10 >/dev/null 2>&1 &
+fi
+if command -v pgrep >/dev/null 2>&1 && ! pgrep -x plank >/dev/null 2>&1; then
+    plank >/dev/null 2>&1 &
+fi
