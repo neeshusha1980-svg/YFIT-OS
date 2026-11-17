@@ -43,8 +43,8 @@ lb clean
 ./auto/config
 ./auto/build
 shopt -s nullglob
-images=(binary/*.iso)
-(( ${#images[@]} == 1 )) || fail "Expected exactly one generated ISO in binary/, found ${#images[@]}"
+images=(yfit-os-amd64.hybrid.iso binary/*.iso)
+(( ${#images[@]} == 1 )) || fail "Expected exactly one generated Yfit ISO from the live-build output (root or binary/), found ${#images[@]}"
 install -m 0644 "${images[0]}" output/yfit-os-amd64.iso
 file output/yfit-os-amd64.iso | tee output/iso-file.txt
 (cd output && sha256sum yfit-os-amd64.iso | tee yfit-os-amd64.iso.sha256)
