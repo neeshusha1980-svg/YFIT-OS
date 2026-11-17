@@ -19,7 +19,7 @@ lb config noauto \
   --firmware-chroot true \
   --firmware-binary true \
   --apt-recommends true \
-  --apt-options '-o Acquire::Check-Valid-Until=false' \
+  --apt-options '--yes -o Acquire::Check-Valid-Until=false' \
   --mirror-bootstrap "$ARCHIVE" \
   --mirror-chroot "$ARCHIVE" \
   --mirror-chroot-security "$SECURITY" \
